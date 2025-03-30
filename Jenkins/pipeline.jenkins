@@ -54,9 +54,9 @@ pipeline {
                     steps {
                         dir('service1') {
                             bat 'docker rmi jerryonimo/jenkinspipelinetest-service1:latest'
-                            if (bat 'docker-compose ps -q') { 
-                                bat 'docker-compose down' 
-                            }
+                            bat 'if (docker-compose ps -q) { 
+                                docker-compose down 
+                            }'
                             bat 'docker-compose up -d --build'
                         }
                     }
