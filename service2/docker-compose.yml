@@ -2,7 +2,7 @@ version: '3'
 
 services:
   service1:
-    image: jerryonimo/jenkinspipelinetest-service1:latest
+    image: jerryonimo/jenkinspipelinetest-service2:latest
     ports:
       - "8001:8001"
     networks:
