@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Docker version') {
+            steps {
+                bat 'docker version'
+            }
+        }
+        stage('Delete workspace') {
+            steps {
+                echo 'Deleting workspace'
+                deleteDir()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/EmelyanovRoma/MA.git'
+                bat 'cd'
+                bat 'dir /a'
+            }
+        }
+        stage('Build docker image') {
+            steps {
+                dir('Service1') {
+                    bat 'docker build -t jerryonimo/service1-image:0.3 .'
+                }
+            }
+        }
+        stage('Push docekr image to Dockerhub') {
+            steps {
+                withDockerRegistry(credentialsId: 'dockerhub-cred-test', url: 'https://index.docker.io/v1/') {
+                    bat 'docker push jerryonimo/service1-image:0.3'
+                }
+            }
+        }
+        stage('Delete docker image locally') {
+            steps {
+                bat 'docker rmi jerryonimo/service1-image:0.3'
+            }
+        }
+    }
+}
