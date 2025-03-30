@@ -1,18 +1,86 @@
 pipeline {
     agent any
     
+    enviroment {
+        PROJECT_NAME = 'jenkinspipelinetest'
+
+        SERVICE1_TAG = 'latest'
+        SERVICE2_TAG = 'latest'
+        NGINX_TAG = 'latest'
+    }
+
     stages {
-        stage('Docker version') {
-            steps {
-                bat 'docker version'
+        stage('Build Images') {
+            parallel {
+                stage('Build Service1') {
+                    steps {
+                        dir('service1') {
+                            bat 'docker build -t "${env:PROJECT_NAME}-service1:${env:SERVICE1_TAG}" .'
+                        }
+                    }
+                }
+
+                stage('Build Service2') {
+                    steps {
+                        dir('service2') {
+                            bat 'docker build -t "${env:PROJECT_NAME}-service2:${env:SERVICE2_TAG}" .'
+                        }
+                    }
+                }
+
+                stage('Build Nginx') {
+                    steps {
+                        dir('gateway') {
+                            bat 'docker build -t "${env:PROJECT_NAME}-gateway:${env:NGINX_TAG}" .'
+                        }
+                    }
+                }
             }
         }
-        stage('Delete workspace') {
+
+        stage('Push to Registry') {
+            steps {
+                withDockerRegistry(credentialsId: 'dockerhub-cred-test', url: 'https://index.docker.io/v1/') {
+                    bat 'docker push "${env:PROJECT_NAME}-service1:${env:SERVICE1_TAG}"'
+                    bat 'docker push "${env:PROJECT_NAME}-service2:${env:SERVICE2_TAG}"'
+                    bat 'docker push "${env:PROJECT_NAME}-gateway:${env:NGINX_TAG}"'
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            parallel {
+                stage('Start Service1') {
+                    steps {
+                        dir('service1') {
+                            bat 'docker-compose up -d --build'
+                        }
+                    }
+                }
+
+                stage('Start Service2') {
+                    steps {
+                        dir('service2') {
+                            bat 'docker-compose up -d --build'
+                        }
+                    }
+                }
+
+                stage('Start Nginx') {
+                    steps {
+                        dir('gateway') {
+                            bat 'docker-compose up -d --build'
+                        }
+                    }
+                }
+            }
+        }
+        /*stage('Delete workspace') {
             steps {
                 echo 'Deleting workspace'
                 deleteDir()
             }
-        }
+        }*/
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/EmelyanovRoma/MA.git'
