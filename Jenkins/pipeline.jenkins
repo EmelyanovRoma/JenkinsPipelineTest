@@ -57,10 +57,39 @@ pipeline {
                                 powershell '''
                                     $containers = docker-compose ps -q
                                     if ($null -ne $containers -and $containers.Count -gt 0) {
+                                        docker-compose down
+                                    }
+                                '''
+                            }
+                        }
+                    }
+                }
+
+                stage('Stop Service2') {
+                    steps {
+                        dir('service2') {
+                            script {
+                                powershell '''
+                                    $containers = docker-compose ps -q
+                                    if ($null -ne $containers -and $containers.Count -gt 0) {
                                         Write-Host "Останавливаем существующие контейнеры..."
                                         docker-compose down
-                                    } else {
-                                        Write-Host "Нет запущенных контейнеров для остановки"
+                                    }
+                                '''
+                            }
+                        }
+                    }
+                }
+
+                stage('Stop Nginx') {
+                    steps {
+                        dir('gateway') {
+                            script {
+                                powershell '''
+                                    $containers = docker-compose ps -q
+                                    if ($null -ne $containers -and $containers.Count -gt 0) {
+                                        Write-Host "Останавливаем существующие контейнеры..."
+                                        docker-compose down
                                     }
                                 '''
                             }
