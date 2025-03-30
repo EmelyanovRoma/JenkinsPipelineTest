@@ -61,7 +61,6 @@ pipeline {
                 stage('Start Service2') {
                     steps {
                         dir('service2') {
-                            bat 'docker-compose down 2>&1 | Out-Null'
                             bat 'docker-compose up -d --build'
                         }
                     }
