@@ -53,6 +53,7 @@ pipeline {
                 stage('Start Service1') {
                     steps {
                         dir('service1') {
+                            bat 'docker rmi jerryonimo/jenkinspipelinetest-service1:latest'
                             bat 'docker-compose up -d --build'
                         }
                     }
