@@ -2,8 +2,7 @@ version: '3'
 
 services:
   service1:
-    build: .
-    container_name: service1
+    image: jerryonimo/jenkinspipelinetest-service1:latest
     ports:
       - "8000:8000"
     networks:
