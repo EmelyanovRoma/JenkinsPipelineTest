@@ -62,6 +62,7 @@ pipeline {
                 stage('Start Service2') {
                     steps {
                         dir('service2') {
+                            bat 'docker rmi jerryonimo/jenkinspipelinetest-service2:latest'
                             bat 'docker-compose up -d --build'
                         }
                     }
@@ -70,6 +71,7 @@ pipeline {
                 stage('Start Nginx') {
                     steps {
                         dir('gateway') {
+                            bat 'docker rmi jerryonimo/jenkinspipelinetest-gateway:latest'
                             bat 'docker-compose up -d --build'
                         }
                     }
