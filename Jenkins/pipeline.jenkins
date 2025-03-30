@@ -1,7 +1,7 @@
 pipeline {
     agent any
     
-    enviroment {
+    environment {
         PROJECT_NAME = 'jenkinspipelinetest'
 
         SERVICE1_TAG = 'latest'
@@ -80,7 +80,7 @@ pipeline {
                 echo 'Deleting workspace'
                 deleteDir()
             }
-        }*/
+        }
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/EmelyanovRoma/MA.git'
@@ -106,6 +106,6 @@ pipeline {
             steps {
                 bat 'docker rmi jerryonimo/service1-image:0.3'
             }
-        }
+        }*/
     }
 }
