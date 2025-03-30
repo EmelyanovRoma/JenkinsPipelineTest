@@ -48,13 +48,34 @@ pipeline {
             }
         }
 
+        stage('Stop exist containers') {
+            parallel {
+                stage('Stop Service1') {
+                    steps {
+                        dir('service1') {
+                            script {
+                                powershell '''
+                                    $containers = docker-compose ps -q
+                                    if ($null -ne $containers -and $containers.Count -gt 0) {
+                                        Write-Host "Останавливаем существующие контейнеры..."
+                                        docker-compose down
+                                    } else {
+                                        Write-Host "Нет запущенных контейнеров для остановки"
+                                    }
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Deploy with Docker Compose') {
             parallel {
                 stage('Start Service1') {
                     steps {
                         dir('service1') {
                             bat 'docker rmi jerryonimo/jenkinspipelinetest-service1:latest'
-                            bat 'if (docker-compose ps -q) { docker-compose down }'
                             bat 'docker-compose up -d --build'
                         }
                     }
